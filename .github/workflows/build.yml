@@ -5,15 +5,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -o CarBrowser.zip
+      - name: Unpack project
+        run: |
+          ls -la
+          for z in *.zip; do [ -e "$z" ] && unzip -o "$z"; done
+          ls -la
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
       - name: Build
-        working-directory: CarBrowser
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: |
+          G=$(find . -name gradlew | head -n 1)
+          cd "$(dirname "$G")"
+          chmod +x gradlew
+          ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: CarBrowser-apk
-          path: CarBrowser/app/build/outputs/apk/debug/app-debug.apk
+          path: '**/app/build/outputs/apk/debug/*.apk'
